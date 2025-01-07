@@ -8,6 +8,13 @@ Crew members tap their RFID cards/keychains at begin and end of crew, which will
 
 TODO
 
+## Repo Layout
+
+- `src` Python source code
+- `test` Tests, automated and manual
+- `doc` Documentation
+- `assets` Images, supporting documents
+
 ## Design
 
 Two RFID card readers are attached to a computer.
