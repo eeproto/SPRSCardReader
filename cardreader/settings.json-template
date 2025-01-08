@@ -1,0 +1,16 @@
+{
+  "_comment": "Google sheet unique ID",
+  "sheets_id": "xxxxxxx-xxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxx",
+
+  "_comment": "Start character as programmed for both card readers",
+  "startchar": "~",
+
+  "_comment": "Stop character for the reader that records crew checkin",
+  "stopchar_in": "#",
+
+  "_comment": "Stop character for the reader that records crew checkout",
+  "stopchar_out": "$",
+
+  "_comment": "Expected bytes for <facility id>:<card id>, valid options are 2:2 and 2:3",
+  "hexformat": "2:2"
+}
