@@ -29,5 +29,13 @@ class CardSheetTester(unittest.TestCase):
 
 
   def test_02_find_a_card_number_in_key_sheet(self):
-    found = CardSheet(self.settings).find_cardnumber_by_key('73','18310')
-    self.assertEqual(found, 'Dylan Condell')
+    found = CardSheet(self.settings).find_name_by_numbers('77','556677')
+    self.assertEqual(found, 'Kate Ross')
+
+  def test_03_entry_unknown_card(self):
+    message = CardSheet(self.settings).entry('999', '999999999', 'in')
+    self.assertEqual(message, 'error finding name')
+
+  def test_01_entry_known_card(self):
+    message = CardSheet(self.settings).entry('98', '6789', 'in')
+    self.assertEqual(message, 'Jack Reacher checked in')

@@ -15,25 +15,33 @@ class CardSheet(object):
     self.keysheet_first_column = 4
     self.keysheet_last_column = 5
     self.keysheet_card_number_column = 2
+    self.keysheet_site_number_column = 1
 
   def find_row_by_number(self, number):
     cells = self.keysheet.find(number)
     print('found row', cells[0].row)
 
-  def entry(self, cardnumber, state):
-    # self.find_row_by_number(cardnumber)
-    us_timestamp = datetime.now().strftime('%m/%d/%Y-%H:%M:%S')
+  def entry(self, facility, card, state):
+    # us_timestamp = datetime.now().strftime('%m/%d/%Y-%H:%M:%S')
     iso_timestamp = datetime.now().isoformat()
-    self.worksheet.append_table([iso_timestamp, cardnumber, state], start='A1', end=None, dimension='ROWS',
-                                overwrite=False)
+    try:
+      self.worksheet.append_table([iso_timestamp, f'{facility}{card}', state], start='A1', end=None, dimension='ROWS',
+                           overwrite=False)
+    except Exception as ex:
+      return f'error writing to sheet {ex}'
+    try:
+      name = self.find_name_by_numbers(facility, card)
+      return f'{name} checked {state}'
+    except Exception as ex:
+      return f'error finding name'
 
-  def find_cardnumber_by_key(self, site_number, card_number):
-    cells = self.keysheet.find(site_number, matchEntireCell=True)
+  def find_name_by_numbers(self, site_number, card_number):
+    cells = self.keysheet.find(card_number, matchEntireCell=True)
     if len(cells) == 0:
       raise Exception('can not find site number')
     match_row = None
     for cell in cells:
-      if self.keysheet.cell((cell.row, self.keysheet_card_number_column)).value == card_number:
+      if self.keysheet.cell((cell.row, self.keysheet_site_number_column)).value == site_number:
         match_row = cell.row
     return f'{self.keysheet.cell((match_row, self.keysheet_first_column)).value} {self.keysheet.cell((match_row, self.keysheet_last_column)).value}'
 
@@ -60,12 +68,11 @@ class CardListener(object):
     else:
       raise Exception('hex format setting unknown')
     print('facility:', facility, 'card:', card)
-    combined = f'{facility}{card}'
-    return combined
+    return (facility, card)
 
   def register(self, card_characters, state):
-    combined = self.convert_card_number(card_characters)
-    CardSheet(self.settings).entry(combined, state)
+    facility, card = self.convert_card_number(card_characters)
+    result_message = CardSheet(self.settings).entry(facility, card, state)
 
   def on_press(self, key):
     try:
