@@ -9,7 +9,7 @@ class CardListenerTester(unittest.TestCase):
 
   @classmethod
   def setUpClass(cls):
-    with open('../cardreader/settings-test.json', 'r') as config_file:
+    with open('settings-test.json', 'r') as config_file:
       cls.settings = json.load(config_file)
 
   def test_01_convert_hex(self):
@@ -24,7 +24,7 @@ class CardSheetTester(unittest.TestCase):
 
   @classmethod
   def setUpClass(cls):
-    with open('../cardreader/settings-test.json', 'r') as config_file:
+    with open('settings-test.json', 'r') as config_file:
       cls.settings = json.load(config_file)
 
 

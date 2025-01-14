@@ -23,17 +23,17 @@ A Python script monitors card reader outputs, detects reader activation, and ext
 
 The script enters card numbers into a google sheet document with the timestamp of reading.
 
-## Windows Installation
+Intended to work without a display, it gives user feedback through text-to-speech voice output.
+
+##  Installation
 
 ### Python
 
-Tested with 3.13.
+Requires Python 3.10. Other versions might not work due to limitations in the text to speech module.
 
-### Startup Shortcut
+Requires workaround for incorrect file info for `en_US-lessac-medium.onnx.json` in `piper/voices.json` to avoid repeated download.
 
-TODO
-
-### Autostart
+### Windows Startup Shortcut
 
 Tested with automatic login of a dedicated non-admin account and link in the user's startup link folder.
 
