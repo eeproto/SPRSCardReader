@@ -15,7 +15,7 @@ class CardListenerTester(unittest.TestCase):
   def test_01_convert_hex(self):
     self.settings['hexformat'] = '2:2'
     combined = CardListener(self.settings).convert_card_number('1a2b3c4d')
-    self.assertEquals(combined, '669915437')
+    self.assertEqual(combined, '669915437')
     self.settings['hexformat'] = '2:3'
     combined = CardListener(self.settings).convert_card_number('1a2b3c4d5e')
-    self.assertEquals(combined, '66993951966')
+    self.assertEqual(combined, '66993951966')
