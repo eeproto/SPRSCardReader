@@ -56,6 +56,7 @@ class CardListener(object):
     self.stopchar_out = self.settings['stopchar_out']
     self.collecting = False
     self.maxlength = 16
+    self.registration_handler = self.register
 
   def convert_card_number(self, card_characters):
     hexcard = int(card_characters, 16)
@@ -68,7 +69,7 @@ class CardListener(object):
     else:
       raise Exception('hex format setting unknown')
     print('facility:', facility, 'card:', card)
-    return (facility, card)
+    return (str(facility), str(card))
 
   def register(self, card_characters, state):
     facility, card = self.convert_card_number(card_characters)
@@ -80,14 +81,14 @@ class CardListener(object):
       if key.char == self.stopchar_in:
         self.collecting = False
         try:
-          self.register(self.cardid, 'in')
+          self.registration_handler(self.cardid, 'in')
         except Exception as ex:
           print('Error decoding card', self.cardid, ex)
         self.cardid = ''
       if key.char == self.stopchar_out:
         self.collecting = False
         try:
-          self.register(self.cardid, 'out')
+          self.registration_handler(self.cardid, 'out')
         except Exception as ex:
           print('Error decoding card', self.cardid, ex)
         self.cardid = ''

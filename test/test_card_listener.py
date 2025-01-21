@@ -4,6 +4,9 @@ import json
 from unittest.mock import patch, MagicMock
 from cardreader.cardreader import CardListener, CardSheet
 
+class MockKey(object):
+  def __init__(self, char):
+    self.char = char
 
 class CardListenerTester(unittest.TestCase):
 
@@ -11,14 +14,36 @@ class CardListenerTester(unittest.TestCase):
   def setUpClass(cls):
     with open('settings-test.json', 'r') as config_file:
       cls.settings = json.load(config_file)
+    # cls.expected_facility = None
+    # cls.expected_card = None
+    cls.expected_card_characters = None
 
   def test_01_convert_hex(self):
     self.settings['hexformat'] = '2:2'
-    combined = CardListener(self.settings).convert_card_number('1a2b3c4d')
-    self.assertEqual(combined, '669915437')
+    (facility, card) = CardListener(self.settings).convert_card_number('1a2b3c4d')
+    self.assertEqual(facility, '6699')
+    self.assertEqual(card, '15437')
     self.settings['hexformat'] = '2:3'
-    combined = CardListener(self.settings).convert_card_number('1a2b3c4d5e')
-    self.assertEqual(combined, '66993951966')
+    (facility, card) = CardListener(self.settings).convert_card_number('1a2b3c4d5e')
+    self.assertEqual(facility, '6699')
+    self.assertEqual(card, '3951966')
+
+  def catch_registration(self, card_characters):
+    # TODO: this approach does not seem to work, never gets called
+    self.assertEqual(self.expected_card_characters, card_characters)
+
+  def test_02_collect_checkin(self):
+    l = CardListener(self.settings)
+    # self.expected_facility = 202
+    # self.expected_card = 65518
+    self.expected_card_characters = 'CAFFEE'
+    l.registration_handler = self.catch_registration
+    l.on_press(MockKey(self.settings['startchar']))
+    for char in 'CAFFEE':
+      l.on_press(MockKey(char))
+    l.on_press(MockKey(self.settings['stopchar_in']))
+
+
 
 class CardSheetTester(unittest.TestCase):
 
