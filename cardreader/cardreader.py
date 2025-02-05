@@ -2,6 +2,7 @@ from pynput import keyboard
 import pygsheets
 from datetime import datetime, timezone
 import json
+import voiceoutput
 
 
 class CardSheet(object):
@@ -28,17 +29,18 @@ class CardSheet(object):
       self.worksheet.append_table([iso_timestamp, f'{facility}{card}', state], start='A1', end=None, dimension='ROWS',
                            overwrite=False)
     except Exception as ex:
-      return f'error writing to sheet {ex}'
+      return f'could not write to sheet {ex}'
     try:
+      now = datetime.now()
       name = self.find_name_by_numbers(facility, card)
-      return f'{name} checked {state}'
+      return f'{name} checked {state} at {now.hour:02d} {now.minute:02d}'
     except Exception as ex:
-      return f'error finding name'
+      return f'could not find name'
 
   def find_name_by_numbers(self, site_number, card_number):
     cells = self.keysheet.find(card_number, matchEntireCell=True)
     if len(cells) == 0:
-      raise Exception('can not find site number')
+      raise Exception('could not find site number')
     match_row = None
     for cell in cells:
       if self.keysheet.cell((cell.row, self.keysheet_site_number_column)).value == site_number:
@@ -57,6 +59,11 @@ class CardListener(object):
     self.collecting = False
     self.maxlength = 16
     self.registration_handler = self.register
+    try:
+      self.voice = voiceoutput.VoiceOutput(self.settings)
+    except Exception as ex:
+      print('error initializing voice output', ex)
+
 
   def convert_card_number(self, card_characters):
     hexcard = int(card_characters, 16)
@@ -74,6 +81,11 @@ class CardListener(object):
   def register(self, card_characters, state):
     facility, card = self.convert_card_number(card_characters)
     result_message = CardSheet(self.settings).entry(facility, card, state)
+    print(result_message)
+    try:
+      self.voice.say(result_message)
+    except Exception as ex:
+      print('error generating voice output', ex)
 
   def on_press(self, key):
     try:
@@ -110,8 +122,7 @@ class CardListener(object):
     #    # Stop listener
     #    return False
 
-
-if __name__ == '__main__':
+def main():
   with open('settings.json', 'r', encoding="utf8") as config_file:
     settings = json.load(config_file)
   cards = CardListener(settings)
@@ -122,8 +133,13 @@ if __name__ == '__main__':
       on_release=cards.on_release) as listener:
     listener.join()
 
+
 #  # ...or, in a non-blocking fashion:
 #  listener = keyboard.Listener(
 #      on_press=on_press,
 #      on_release=on_release)
 #  listener.start()
+
+
+if __name__ == '__main__':
+  main()
