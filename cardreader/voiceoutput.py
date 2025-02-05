@@ -15,7 +15,7 @@ class VoiceOutput(object):
     self.use_external_call_workaround = force_external_piper_call or (platform.system().lower() == 'windows')
     if self.use_external_call_workaround:
       # do this without using piper python libraries
-      with open(f'{self.model}.onnx.json', 'r') as voice_config_file:
+      with open(f'{self.model}.onnx.json', 'r', encoding="utf8") as voice_config_file:
         self.sample_rate = json.load(voice_config_file)['audio']['sample_rate']
     else:
       from piper.voice import PiperVoice

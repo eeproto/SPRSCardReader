@@ -112,7 +112,7 @@ class CardListener(object):
 
 
 if __name__ == '__main__':
-  with open('settings.json', 'r') as config_file:
+  with open('settings.json', 'r', encoding="utf8") as config_file:
     settings = json.load(config_file)
   cards = CardListener(settings)
 
