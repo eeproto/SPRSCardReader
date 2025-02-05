@@ -40,6 +40,8 @@ patch $VIRTUAL_ENV/lib/python3.10/site-packages/piper/voices.json piper_120_voic
 
 Download `piper_windows_amd64.zip` from [piper-tts releases](https://github.com/rhasspy/piper/releases). Unzip into this folder, such that you can call `piper\piper.exe` from the commandline when being in the same folder as the json configuration files.
 
+Also manually download the voice you want to use from [huggingface](https://huggingface.co/rhasspy/piper-voices). The default (and hard coded) at this point being `en_US-lessac-medium`. Get both the `.onnx` and `.onnx.json` from [lessac/medium](https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/lessac/medium) and place them in the same folder.  
+
 #### Startup Shortcut
 
 Tested with automatic login of a dedicated non-admin account and link in the user's startup link folder.

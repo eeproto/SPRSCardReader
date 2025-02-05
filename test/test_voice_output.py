@@ -16,7 +16,7 @@ class VoiceOuputTester(unittest.TestCase):
     vo = VoiceOutput(self.settings)
     vo.say('this is a test, 1, 2, 3.')
 
-  def test_02_say_hi_with_workaround(self):
-    vo = VoiceOutput(self.settings)
+  def test_02_say_hi_through_external_piper(self):
+    vo = VoiceOutput(self.settings, force_external_piper_call=True)
     vo.use_external_call_workaround = True
-    vo.say('speaking through external call.')
+    vo.say('this tests the external piper call.')

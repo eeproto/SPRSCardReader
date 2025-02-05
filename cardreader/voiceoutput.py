@@ -1,33 +1,40 @@
 import numpy as np
 import sounddevice as sd
-from piper.voice import PiperVoice
-from piper.download import ensure_voice_exists, get_voices
 import os
 import platform
 from subprocess import Popen, PIPE
+import json
 
 
 class VoiceOutput(object):
 
-  def __init__(self, settings):
+  def __init__(self, settings, force_external_piper_call=False):
     self.settings = settings
     self.model = "en_US-lessac-medium"
     self.voice_path = os.getcwd()
-    voices_available = get_voices(self.voice_path, update_voices=False)
-    ensure_voice_exists(
-      name=self.model,
-      data_dirs=[self.voice_path],
-      download_dir=self.voice_path,
-      voices_info=voices_available)
-    self.voice = PiperVoice.load(f'{self.model}.onnx')
-    self.use_external_call_workaround = (platform.system().lower() == 'windows')
+    self.use_external_call_workaround = force_external_piper_call or (platform.system().lower() == 'windows')
+    if self.use_external_call_workaround:
+      # do this without using piper python libraries
+      with open(f'{self.model}.onnx.json', 'r') as voice_config_file:
+        self.sample_rate = json.load(voice_config_file)['audio']['sample_rate']
+    else:
+      from piper.voice import PiperVoice
+      from piper.download import ensure_voice_exists, get_voices
+      voices_available = get_voices(self.voice_path, update_voices=False)
+      ensure_voice_exists(
+        name=self.model,
+        data_dirs=[self.voice_path],
+        download_dir=self.voice_path,
+        voices_info=voices_available)
+      self.voice = PiperVoice.load(f'{self.model}.onnx')
+      self.sample_rate = self.voice.config.sample_rate
 
   def say(self, text):
     if self.use_external_call_workaround:
       speech = self._stream_external(text)
     else:
       speech = self._stream_internal(text)
-    with sd.OutputStream(samplerate=self.voice.config.sample_rate, channels=1, dtype='int16') as speaker:
+    with sd.OutputStream(samplerate=self.sample_rate, channels=1, dtype='int16') as speaker:
       speaker.start()
       for audio_bytes in speech:
         int_data = np.frombuffer(audio_bytes, dtype=np.int16)

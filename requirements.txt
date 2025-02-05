@@ -1,4 +1,6 @@
 pynput
 pygsheets
+onnx-runtime
+numpy
 piper-tts
 sounddevice
